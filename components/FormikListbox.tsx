@@ -1,6 +1,7 @@
 import React from "react";
 import { useState } from "react";
 import { Listbox } from "@headlessui/react";
+import { AiFillCaretDown, AiFillCaretUp } from "react-icons/ai";
 import cn from "classnames";
 
 export type ListboxOption<T> = {
@@ -18,48 +19,56 @@ type Props<T> = {
 
 const FormikListbox = <T,>(props: Props<T>) => {
   const options = props.options;
-  const [selected, setSelected] = useState<T | undefined>();
+  const [selectedValue, setSelectedValue] = useState<T | undefined>();
 
-  const _selected = options.find((o) => o.value === selected);
-  const _label = _selected?.label ?? props.label ?? "Select Option...";
+  const selectedItem = options.find((o) => o.value === selectedValue);
+  const label = selectedItem?.label ?? props.label ?? "Select Option...";
 
   return (
-    <Listbox value={selected} onChange={setSelected} as={React.Fragment}>
-      {({ open }) => (
-        <div
-          className={cn({
-            "dropdown dropdown-end w-full": true,
-            "dropdown-open": open,
-          })}
-        >
-          <Listbox.Button className="btn btn-outline w-full relative no-animation">
-            {_label}
-          </Listbox.Button>
-          <Listbox.Options
+    <Listbox
+      value={selectedValue}
+      onChange={setSelectedValue}
+      as={React.Fragment}
+    >
+      {({ open }) => {
+        const Icon = open ? AiFillCaretUp : AiFillCaretDown;
+        return (
+          <div
             className={cn({
-              "dropdown-content menu p-2 shadow-lg": true,
-              "bg-base-100 rounded-box w-72": true,
-              hidden: !open,
+              "dropdown dropdown-end w-full": true,
+              "dropdown-open": open,
             })}
           >
-            {options.map((option, i) => (
-              <Listbox.Option key={i} value={option.value}>
-                {({ active, disabled, selected }) => (
-                  <button
-                    className={cn({
-                      active: selected,
-                      "btn-disabled": disabled,
-                      "bg-primary/80 text-primary-content": active,
-                    })}
-                  >
-                    {option.label}
-                  </button>
-                )}
-              </Listbox.Option>
-            ))}
-          </Listbox.Options>
-        </div>
-      )}
+            <Listbox.Button className="btn btn-outline w-full relative no-animation">
+              {label}
+              <Icon size={20} className="absolute right-5" />
+            </Listbox.Button>
+            <Listbox.Options
+              className={cn({
+                "dropdown-content menu p-2 shadow-lg": true,
+                "bg-base-100 rounded-box w-72": true,
+                hidden: !open,
+              })}
+            >
+              {options.map((option, i) => (
+                <Listbox.Option key={i} value={option.value}>
+                  {({ active, disabled, selected }) => (
+                    <button
+                      className={cn({
+                        active: selected,
+                        "btn-disabled": disabled,
+                        "bg-primary/80 text-primary-content": active,
+                      })}
+                    >
+                      {option.label}
+                    </button>
+                  )}
+                </Listbox.Option>
+              ))}
+            </Listbox.Options>
+          </div>
+        );
+      }}
     </Listbox>
   );
 };
